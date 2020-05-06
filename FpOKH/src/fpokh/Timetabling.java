@@ -18,6 +18,82 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
+class Timetabling {
+    //load dataset
+    static String folderDataset = "D:\\Kuliah\\SEMESTER 6\\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\\FP\\Toronto\\";
+    static String[][] file = {	{"car-f-92", "car-f-92"}, {"car-s-91", "car-s-91"}, {"ear-f-83", "ear-f-83"}, {"hec-s-92", "hec-s-92"}, 
+					{"kfu-s-93", "kfu-s-93"}, {"lse-f-91", "lse-f-91"}, {"pur-s-93", "pur-s-93"}, {"rye-s-93", "rye-s-93"}, {"sta-f-83", "sta-f-83"},
+					{"tre-s-92", "tre-s-92"}, {"uta-s-92", "uta-s-92"}, {"ute-s-92", "ute-s-92"}, {"yor-f-83", "yor-f-83"}
+				};
+    // fill with course & its timeslot
+    static int timeslot[]; 
+    static int[][] conflict_matrix, course_sorted, hasil_timeslot;
+	
+    private static Scanner scanner;
+	
+    public static void main(String[] args) throws IOException {
+        scanner = new Scanner(System.in);
+        for	(int i=0; i< file.length; i++)
+        	System.out.println(i+1 + ". Penjadwalan " + file[i][1]);
+        
+        System.out.print("\nSilahkan pilih file untuk dijadwalkan : ");
+        int pilih = scanner.nextInt();
+        
+        String filePilihanInput = file[pilih-1][0];
+        String filePilihanOutput = file[pilih-1][1];
+        
+        String file = folderDataset + filePilihanInput;
+       	
+        Course course = new Course(file);
+        int jumlahexam = course.getCourseTotal();
+        
+        conflict_matrix = course.getConflictMatrix();
+        int jumlahmurid = course.getStudentsTotal();
+        
+	// sort exam by degree
+	course_sorted = course.sortingByDegree(conflict_matrix, jumlahexam);
+		
+	// scheduling
+	/*
+	 * Scheduling by largest degree
+	 */	
+	long starttimeLargestDegree = System.nanoTime();
+	Schedule schedule = new Schedule(file, conflict_matrix, jumlahexam);
+	timeslot = schedule.schedulingBySaturationDegree(course_sorted,timeslot);
+	int[][] timeslotByLargestDegree = schedule.getSchedule();
+	long endtimeLargestDegree = System.nanoTime();
+        
+        /*
+	 * params 1: file to be scheduling
+	 * params 2: conflict matrix from file
+	 * params 3: sort course by degree
+	 * params 4: how many course from file
+	 * params 5: how many student from file
+	 * params 6: how many iterations
+	 */
+	HillClimbing HillClimbing = new HillClimbing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000000);
+	/*
+	 * use hill climbing for timesloting
+	 */
+	long starttimeHC = System.nanoTime();
+	HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
+	long endtimeHC = System.nanoTime();
+		
+
+	System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
+	System.out.println("INITIAL SOLUTION - LARGEST DEGREE FIRST");	
+	System.out.println("Timeslot 	: " + schedule.getJumlahTimeSlot(schedule.getSchedule()));
+	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, schedule.getSchedule(), jumlahmurid));
+	System.out.println("Running Time    : " + ((double) (endtimeLargestDegree - starttimeLargestDegree)/1000000000) + " detik.\n");
+        
+        System.out.println("HILL CLIMBING");
+        System.out.println("Timeslot	: " + HillClimbing.getJumlahTimeslotHC());
+	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, HillClimbing.getTimeslotHillClimbing(), jumlahmurid));
+	System.out.println("Running Time    : " + ((double) (endtimeHC - starttimeHC)/1000000000) + " detik.\n");
+    }
+}
+
+
 class Course {
     int studentsTotal;
     
@@ -281,61 +357,4 @@ class Evaluator {
 	    return random.nextInt(max - min) + min;
 	}
 }
-
-public class Timetabling {
-    //load dataset
-    static String folderDataset = "D:\\Kuliah\\SEMESTER 6\\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\\FP\\Toronto\\";
-    static String[][] file = {	{"car-f-92", "car-f-92"}, {"car-s-91", "car-s-91"}, {"ear-f-83", "ear-f-83"}, {"hec-s-92", "hec-s-92"}, 
-					{"kfu-s-93", "kfu-s-93"}, {"lse-f-91", "lse-f-91"}, {"pur-s-93", "pur-s-93"}, {"rye-s-93", "rye-s-93"}, {"sta-f-83", "sta-f-83"},
-					{"tre-s-92", "tre-s-92"}, {"uta-s-92", "uta-s-92"}, {"ute-s-92", "ute-s-92"}, {"yor-f-83", "yor-f-83"}
-				};
-    // fill with course & its timeslot
-    static int timeslot[]; 
-    static int[][] conflict_matrix, course_sorted, hasil_timeslot;
-	
-    private static Scanner scanner;
-	
-    public static void main(String[] args) throws IOException {
-        scanner = new Scanner(System.in);
-        for	(int i=0; i< file.length; i++)
-        	System.out.println(i+1 + ". Penjadwalan " + file[i][1]);
-        
-        System.out.print("\nSilahkan pilih file untuk dijadwalkan : ");
-        int pilih = scanner.nextInt();
-        
-        String filePilihanInput = file[pilih-1][0];
-        String filePilihanOutput = file[pilih-1][1];
-        
-        String file = folderDataset + filePilihanInput;
-       	
-        Course course = new Course(file);
-        int jumlahexam = course.getCourseTotal();
-        
-        conflict_matrix = course.getConflictMatrix();
-        int jumlahmurid = course.getStudentsTotal();
-        
-		// sort exam by degree
-		course_sorted = course.sortingByDegree(conflict_matrix, jumlahexam);
-		
-		// scheduling
-		/*
-		 * Scheduling by largest degree
-		 */
-		
-		long starttimeLargestDegree = System.nanoTime();
-		Schedule schedule = new Schedule(file, conflict_matrix, jumlahexam);
-		timeslot = schedule.schedulingBySaturationDegree(course_sorted,timeslot);
-		int[][] timeslotByLargestDegree = schedule.getSchedule();
-		long endtimeLargestDegree = System.nanoTime();
-
-		System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
-		
-		System.out.println("Timeslot dibutuhkan (menggunakan \"Constructive Heuristics\") 	: " + schedule.getJumlahTimeSlot(schedule.getSchedule()));
-		System.out.println("Penalti \"Constructive Heuristics\" 				: " + Evaluator.getPenalty(conflict_matrix, schedule.getSchedule(), jumlahmurid));
-		System.out.println("Waktu eksekusi yang dibutuhkan \"Constructive Heuristics\" " + ((double) (endtimeLargestDegree - starttimeLargestDegree)/1000000000) + " detik.\n");
-    }
-}
-
-
-
 
