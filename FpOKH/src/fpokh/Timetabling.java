@@ -20,7 +20,9 @@ import java.util.Scanner;
 
 class Timetabling {
     //load dataset
-    static String folderDataset = "D:\\Kuliah\\SEMESTER 6\\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\\FP\\Toronto\\";
+    //Path Dataset Bafi: D:\Kuliah\SEMESTER 6\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\FP\Toronto\
+    //Path Dataset Jauhar: C:\Users\Jauhar\Documents\Kuliah Semester 6\OKH\FP\Toronto\
+    static String folderDataset = "C:\\Users\\Jauhar\\Documents\\Kuliah Semester 6\\OKH\\FP\\Toronto\\";
     static String[][] file = {	{"car-f-92", "car-f-92"}, {"car-s-91", "car-s-91"}, {"ear-f-83", "ear-f-83"}, {"hec-s-92", "hec-s-92"}, 
 					{"kfu-s-93", "kfu-s-93"}, {"lse-f-91", "lse-f-91"}, {"pur-s-93", "pur-s-93"}, {"rye-s-93", "rye-s-93"}, {"sta-f-83", "sta-f-83"},
 					{"tre-s-92", "tre-s-92"}, {"uta-s-92", "uta-s-92"}, {"ute-s-92", "ute-s-92"}, {"yor-f-83", "yor-f-83"}
@@ -75,10 +77,16 @@ class Timetabling {
 	/*
 	 * use hill climbing for timesloting
 	 */
-	long starttimeHC = System.nanoTime();
-	HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
-	long endtimeHC = System.nanoTime();
-		
+//	long starttimeHC = System.nanoTime();
+//	HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
+//	long endtimeHC = System.nanoTime();
+	
+//      SIMULATED ANNEALING
+//      params : temperature
+        SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 10000);
+        long starttimeSA = System.nanoTime();
+        simulatedAnnealing.getTimeslotBySimulatedAnnealing(100.0);
+        long endtimeSA = System.nanoTime();
 
 	System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
 	System.out.println("INITIAL SOLUTION - LARGEST DEGREE FIRST");	
@@ -86,10 +94,16 @@ class Timetabling {
 	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, schedule.getSchedule(), jumlahmurid));
 	System.out.println("Running Time    : " + ((double) (endtimeLargestDegree - starttimeLargestDegree)/1000000000) + " detik.\n");
         
-        System.out.println("HILL CLIMBING");
-        System.out.println("Timeslot	: " + HillClimbing.getJumlahTimeslotHC());
-	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, HillClimbing.getTimeslotHillClimbing(), jumlahmurid));
-	System.out.println("Running Time    : " + ((double) (endtimeHC - starttimeHC)/1000000000) + " detik.\n");
+//        System.out.println("HILL CLIMBING");
+//        System.out.println("Timeslot	: " + HillClimbing.getJumlahTimeslotHC());
+//	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, HillClimbing.getTimeslotHillClimbing(), jumlahmurid));
+//	System.out.println("Running Time    : " + ((double) (endtimeHC - starttimeHC)/1000000000) + " detik.\n");
+        
+        System.out.println("SIMULATED ANNEALING");
+        System.out.println("Timeslot dibutuhkan (menggunakan Simulated Annealing) 		: " + simulatedAnnealing.getJumlahTimeslotSA());
+        System.out.println("Penalti Simulated Annealing 					: " + Evaluator.getPenalty(conflict_matrix, simulatedAnnealing.getTimeslotSA(), jumlahmurid));
+        System.out.println("Waktu eksekusi yang dibutuhkan Simmulated Annealing " + ((double) (endtimeSA - starttimeSA)/1000000000) + " detik.\n");
+        System.out.println("");
     }
 }
 
