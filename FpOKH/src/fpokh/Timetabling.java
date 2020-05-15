@@ -22,7 +22,7 @@ class Timetabling {
     //load dataset
     //Path Dataset Bafi: D:\Kuliah\SEMESTER 6\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\FP\Toronto\
     //Path Dataset Jauhar: C:\Users\Jauhar\Documents\Kuliah Semester 6\OKH\FP\Toronto\
-    static String folderDataset = "C:\\Users\\Jauhar\\Documents\\Kuliah Semester 6\\OKH\\FP\\Toronto\\";
+    static String folderDataset = "D:Kuliah\\SEMESTER 6\\[Pilihan - RDIB] Optimasi Kombinatorik Heuristik\\FP\\Toronto\\";
     static String[][] file = {	{"car-f-92", "car-f-92"}, {"car-s-91", "car-s-91"}, {"ear-f-83", "ear-f-83"}, {"hec-s-92", "hec-s-92"}, 
 					{"kfu-s-93", "kfu-s-93"}, {"lse-f-91", "lse-f-91"}, {"pur-s-93", "pur-s-93"}, {"rye-s-93", "rye-s-93"}, {"sta-f-83", "sta-f-83"},
 					{"tre-s-92", "tre-s-92"}, {"uta-s-92", "uta-s-92"}, {"ute-s-92", "ute-s-92"}, {"yor-f-83", "yor-f-83"}
@@ -53,65 +53,71 @@ class Timetabling {
         int jumlahmurid = course.getStudentsTotal();
         
 	// sort exam by degree
-	course_sorted = course.sortingByDegree(conflict_matrix, jumlahexam);
+		course_sorted = course.sortingByDegree(conflict_matrix, jumlahexam);
 		
-	// scheduling
-	/*
-	 * Scheduling by largest degree
-	 */	
-	long starttimeLargestDegree = System.nanoTime();
-	Schedule schedule = new Schedule(file, conflict_matrix, jumlahexam);
-	timeslot = schedule.schedulingBySaturationDegree(course_sorted,timeslot);
-	int[][] timeslotByLargestDegree = schedule.getSchedule();
-	long endtimeLargestDegree = System.nanoTime();
-        
-        /*
-	 * params 1: file to be scheduling
-	 * params 2: conflict matrix from file
-	 * params 3: sort course by degree
-	 * params 4: how many course from file
-	 * params 5: how many student from file
-	 * params 6: how many iterations
-	 */
 	
-//	HillClimbing HillClimbing = new HillClimbing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000000);
-//	long starttimeHC = System.nanoTime();
-//	HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
-//	long endtimeHC = System.nanoTime();
+//		LARGEST DEGREE
+		long starttimeLargestDegree = System.nanoTime();
+		Schedule schedule = new Schedule(file, conflict_matrix, jumlahexam);
+		timeslot = schedule.schedulingBySaturationDegree(course_sorted,timeslot);
+		int[][] timeslotByLargestDegree = schedule.getSchedule();
+		long endtimeLargestDegree = System.nanoTime();
+        
+    	/*
+	 	params 1: file to be scheduling
+	 	params 2: conflict matrix from file
+	 	params 3: sort course by degree
+	 	params 4: how many course from file
+	 	params 5: how many student from file
+	 	params 6: how many iterations
+	 	*/
+	
+//		HILL CLIMBING
+		/*
+		HillClimbing HillClimbing = new HillClimbing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000000);
+		long starttimeHC = System.nanoTime();
+		HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
+		long endtimeHC = System.nanoTime();
+		*/
 	
 //      SIMULATED ANNEALING
 //      params : temperature
-        SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 10000);
+		/*
+		SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 10000);
         long starttimeSA = System.nanoTime();
         simulatedAnnealing.getTimeslotBySimulatedAnnealing(100.0);
         long endtimeSA = System.nanoTime();
+		*/
 
-// TABU SEARCH
-		TabuSearch tabuSearch = new TabuSearch(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000);
+// 		TABU SEARCH
+		TabuSearch tabuSearch = new TabuSearch(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 10000);
 		long starttimeTS = System.nanoTime();
 		tabuSearch.getTimeslotByTabuSearch();
 		long endtimeTS = System.nanoTime();
 
-	System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
-	System.out.println("INITIAL SOLUTION - LARGEST DEGREE FIRST");	
-	System.out.println("Timeslot 	: " + schedule.getJumlahTimeSlot(schedule.getSchedule()));
-	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, schedule.getSchedule(), jumlahmurid));
-	System.out.println("Running Time    : " + ((double) (endtimeLargestDegree - starttimeLargestDegree)/1000000000) + " detik.\n");
-        
-//        System.out.println("HILL CLIMBING");
-//        System.out.println("Timeslot	: " + HillClimbing.getJumlahTimeslotHC());
-//	System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, HillClimbing.getTimeslotHillClimbing(), jumlahmurid));
-//	System.out.println("Running Time    : " + ((double) (endtimeHC - starttimeHC)/1000000000) + " detik.\n");
-        
-        System.out.println("SIMULATED ANNEALING");
-        System.out.println("Timeslot dibutuhkan (menggunakan Simulated Annealing) 		: " + simulatedAnnealing.getJumlahTimeslotSA());
-        System.out.println("Penalti Simulated Annealing 					: " + Evaluator.getPenalty(conflict_matrix, simulatedAnnealing.getTimeslotSA(), jumlahmurid));
-        System.out.println("Waktu eksekusi yang dibutuhkan Simmulated Annealing " + ((double) (endtimeSA - starttimeSA)/1000000000) + " detik.\n");
-		System.out.println("");
+		System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
+		System.out.println("INITIAL SOLUTION - LARGEST DEGREE FIRST");	
+		System.out.println("Timeslot 	: " + schedule.getJumlahTimeSlot(schedule.getSchedule()));
+		System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, schedule.getSchedule(), jumlahmurid));
+		System.out.println("Running Time    : " + ((double) (endtimeLargestDegree - starttimeLargestDegree)/1000000000) + " detik.\n");
 		
-		System.out.println("Timeslot dibutuhkan (menggunakan Tabu Search) 			: " + tabuSearch.getJumlahTimeslotTabuSearch());
-		System.out.println("Penalti Tabu Search 						: " + Evaluator.getPenalty(conflict_matrix, tabuSearch.getTimeslotTabuSearch(), jumlahmurid));
-		System.out.println("Waktu eksekusi yang dibutuhkan Tabu Search " + ((double) (endtimeTS - starttimeTS)/1000000000) + " detik.");
+		/*
+    	System.out.println("HILL CLIMBING");
+	    System.out.println("Timeslot	: " + HillClimbing.getJumlahTimeslotHC());
+		System.out.println("Penalty         : " + Evaluator.getPenalty(conflict_matrix, HillClimbing.getTimeslotHillClimbing(), jumlahmurid));
+		System.out.println("Running Time    : " + ((double) (endtimeHC - starttimeHC)/1000000000) + " detik.\n");
+		*/
+		/*
+        System.out.println("SIMULATED ANNEALING");
+        System.out.println("Timeslot	: " + simulatedAnnealing.getJumlahTimeslotSA());
+        System.out.println("Penalty			: " + Evaluator.getPenalty(conflict_matrix, simulatedAnnealing.getTimeslotSA(), jumlahmurid));
+        System.out.println("Running Time	: " + ((double) (endtimeSA - starttimeSA)/1000000000) + " detik.\n");
+		*/
+
+		System.out.println("TABU SEARCH");
+		System.out.println("Timeslot 	: " + tabuSearch.getJumlahTimeslotTabuSearch());
+		System.out.println("Penalty		: " + Evaluator.getPenalty(conflict_matrix, tabuSearch.getTimeslotTabuSearch(), jumlahmurid));
+		System.out.println("Running Time	: " + ((double) (endtimeTS - starttimeTS)/1000000000) + " detik.\n");
     }
 }
 
