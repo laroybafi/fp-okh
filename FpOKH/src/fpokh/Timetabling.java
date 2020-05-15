@@ -73,10 +73,8 @@ class Timetabling {
 	 * params 5: how many student from file
 	 * params 6: how many iterations
 	 */
-	HillClimbing HillClimbing = new HillClimbing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000000);
-	/*
-	 * use hill climbing for timesloting
-	 */
+	
+//	HillClimbing HillClimbing = new HillClimbing(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000000);
 //	long starttimeHC = System.nanoTime();
 //	HillClimbing.getTimeslotByHillClimbing(); // use hillclimbing methode for iterates 1000000 times
 //	long endtimeHC = System.nanoTime();
@@ -87,6 +85,12 @@ class Timetabling {
         long starttimeSA = System.nanoTime();
         simulatedAnnealing.getTimeslotBySimulatedAnnealing(100.0);
         long endtimeSA = System.nanoTime();
+
+// TABU SEARCH
+		TabuSearch tabuSearch = new TabuSearch(file, conflict_matrix, course_sorted, jumlahexam, jumlahmurid, 1000);
+		long starttimeTS = System.nanoTime();
+		tabuSearch.getTimeslotByTabuSearch();
+		long endtimeTS = System.nanoTime();
 
 	System.out.println("PENJADWALAN UNTUK " + filePilihanOutput + "\n");
 	System.out.println("INITIAL SOLUTION - LARGEST DEGREE FIRST");	
@@ -103,7 +107,11 @@ class Timetabling {
         System.out.println("Timeslot dibutuhkan (menggunakan Simulated Annealing) 		: " + simulatedAnnealing.getJumlahTimeslotSA());
         System.out.println("Penalti Simulated Annealing 					: " + Evaluator.getPenalty(conflict_matrix, simulatedAnnealing.getTimeslotSA(), jumlahmurid));
         System.out.println("Waktu eksekusi yang dibutuhkan Simmulated Annealing " + ((double) (endtimeSA - starttimeSA)/1000000000) + " detik.\n");
-        System.out.println("");
+		System.out.println("");
+		
+		System.out.println("Timeslot dibutuhkan (menggunakan Tabu Search) 			: " + tabuSearch.getJumlahTimeslotTabuSearch());
+		System.out.println("Penalti Tabu Search 						: " + Evaluator.getPenalty(conflict_matrix, tabuSearch.getTimeslotTabuSearch(), jumlahmurid));
+		System.out.println("Waktu eksekusi yang dibutuhkan Tabu Search " + ((double) (endtimeTS - starttimeTS)/1000000000) + " detik.");
     }
 }
 
